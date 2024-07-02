@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class Controller {
 
     @Autowired
-    private Service service;
+    private EmployeeService service;
 
     @PostMapping
     public ResponseEntity<Employee> saveEmployee(@RequestBody Employee employee) {

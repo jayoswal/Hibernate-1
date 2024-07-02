@@ -3,15 +3,44 @@ package com.jayoswal.hibernate_demo;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @org.springframework.stereotype.Service
-public class Service {
+public class EmployeeService {
 
     @Autowired
-    private Repository repository;
+    private EmployeeRepository repository;
 
-    public Employee saveEmployee(Employee employee){
+    @Autowired
+    private AddressService addressService;
+
+    //@Transactional(propagation = Propagation.REQUIRED)
+    public Employee saveEmployee(Employee employee) {
         Employee saved = repository.save(employee);
+
+        if(saved.getName() != null) {
+            // throw new RuntimeException();
+        }
+
+        Address address = new Address();
+        address.setAddress("Satara");
+        address.setEmployee(saved);
+//        try {
+//            addressService.addNew(address);
+//        }
+//        catch (DataIntegrityViolationException e) {
+//            // we try to save employee in adress which doe not exisits yet
+//            System.out.println(e.getClass());
+//        }
+
+        // remove transactional in this method at line 19 saveEmployee()
+        addressService.addNewMandatory(address);
+
+        // make this transactional as required at line 19
+        addressService.addNewNever(address);
+
         return saved;
     }
 
@@ -37,6 +66,5 @@ public class Service {
         session.remove(employee);
         Boolean exists3 = session.contains(employee);
         System.out.println("Exists :" + exists3);
-
     }
 }
